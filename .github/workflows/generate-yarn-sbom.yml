@@ -22,9 +22,8 @@ jobs:
   generate-sbom:
     runs-on: ubuntu-latest
     if: >
-      github.repository == 'eclipse/openvsx' && (
       startsWith(github.event.release.tag_name || inputs.tag, 'cli-') ||
-      startsWith(github.event.release.tag_name || inputs.tag, 'webui-'))
+      startsWith(github.event.release.tag_name || inputs.tag, 'webui-')
     outputs:
       project-version: ${{ steps.metadata.outputs.PROJECT_VERSION }}
       product-name: ${{ steps.metadata.outputs.PRODUCT_NAME }}
