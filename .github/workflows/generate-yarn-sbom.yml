@@ -74,7 +74,7 @@ jobs:
         working-directory: ${{ steps.metadata.outputs.PRODUCT_PATH }}
         run: |
           yarn dlx -q @cyclonedx/yarn-plugin-cyclonedx@${{ env.CYCLONEDX_YARN_PLUGIN_VERSION }} \
-            --output-format json \
+            --output-format JSON \
             --output-file bom.json \
             --production
 
