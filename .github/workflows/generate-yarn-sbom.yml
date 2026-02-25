@@ -14,9 +14,9 @@ permissions:
   contents: read
 
 env:
-  DT_PARENT_PROJECT_ID_CLI: e4ead4c5-b141-4d4e-ab28-0d502b0be024
-  DT_PARENT_PROJECT_ID_WEBUI: 6db35d0e-dce5-4737-a4d1-4f4f2998edda
-  CYCLONEDX_YARN_PLUGIN_VERSION: 3.2.1
+  DT_PARENT_PROJECT_ID_CLI: "e4ead4c5-b141-4d4e-ab28-0d502b0be024"
+  DT_PARENT_PROJECT_ID_WEBUI: "6db35d0e-dce5-4737-a4d1-4f4f2998edda"
+  CYCLONEDX_YARN_PLUGIN_VERSION: "3.2.1"
 
 jobs:
   generate-sbom:
@@ -32,8 +32,9 @@ jobs:
     steps:
       - name: Resolve product metadata from tag
         id: metadata
+        env:
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
-          TAG="${{ github.event.release.tag_name || inputs.tag }}"
           if [[ "$TAG" == cli-* ]]; then
             echo "PRODUCT_NAME=openvsx-cli" >> $GITHUB_OUTPUT
             echo "PRODUCT_PATH=cli" >> $GITHUB_OUTPUT
@@ -45,13 +46,6 @@ jobs:
             echo "PARENT_PROJECT_ID=${{ env.DT_PARENT_PROJECT_ID_WEBUI }}" >> $GITHUB_OUTPUT
             echo "PROJECT_VERSION=${TAG#webui-}" >> $GITHUB_OUTPUT
           fi
-
-      - name: Print product metadata
-        run: |
-          echo "PRODUCT_NAME:      ${{ steps.metadata.outputs.PRODUCT_NAME }}"
-          echo "PRODUCT_PATH:      ${{ steps.metadata.outputs.PRODUCT_PATH }}"
-          echo "PROJECT_VERSION:   ${{ steps.metadata.outputs.PROJECT_VERSION }}"
-          echo "PARENT_PROJECT_ID: ${{ steps.metadata.outputs.PARENT_PROJECT_ID }}"
 
       - name: Checkout repository at release tag
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -89,7 +83,7 @@ jobs:
           path: ${{ steps.metadata.outputs.PRODUCT_PATH }}/bom.json
 
   store-sbom-data:
-    needs: [generate-sbom]
+    needs: ["generate-sbom"]
     uses: eclipse-csi/workflows/.github/workflows/store-sbom-data.yml@main
     with:
       projectName: ${{ needs.generate-sbom.outputs.product-name }}
